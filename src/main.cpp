@@ -1,20 +1,13 @@
-#include <OpenXLSX.hpp>
 #include <iostream>
+#include "nlohmann/json.hpp"
+#include "OpenXLSX.hpp"
 
-using namespace std;
+using namespace nlohmann;
 using namespace OpenXLSX;
+using namespace std;
 
-int main(int argc, char* argv[]) {
-    string fileName;
-    for (int argIndex = 1; argIndex < argc; argIndex++) {
-        if (argv[argIndex][0] != '-') {
-            fileName = argv[argIndex];
-        }
-    }
-    if (fileName == "") {
-        cerr << "No Input File" << endl;
-    } else {
-        cout << "Reading File: " << fileName << endl;
-    }
+int main()
+{
+    json test;
     return 0;
 }

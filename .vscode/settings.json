@@ -3,5 +3,6 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "[makefile]": {
         "editor.insertSpaces": false,
-    }
+    },
+    "C_Cpp.errorSquiggles": "Enabled"
 }
