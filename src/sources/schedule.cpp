@@ -1,6 +1,4 @@
 #include "schedule.h"
-#include "nlohmann/json.hpp"
-#include "OpenXLSX.hpp"
 
 #include <string>
 #include <iostream>
@@ -9,7 +7,11 @@
 #include <list>
 
 #include "date/date.h"
+#include "args.h"
 #include "date/tz.h"
+#include "nlohmann/json.hpp"
+#include "OpenXLSX.hpp"
+#include "logger.h"
 
 using nlohmann::json;
 
@@ -35,12 +37,12 @@ bool Schedule::validate(std::string &content)
             }
         }
     }
-    return true;
+    return content.length() >= location_length;
 }
 
 bool Schedule::taken(std::string &content)
 {
-    for (std::vector<std::string>::iterator iter = classes.begin(); iter < classes.end(); iter++)
+    for (std::vector<std::string>::iterator iter = coursesTaken.begin(); iter < coursesTaken.end(); iter++)
     {
         if (content.find(*iter) != std::string::npos)
         {
@@ -50,12 +52,11 @@ bool Schedule::taken(std::string &content)
     return false;
 }
 
-std::vector<Event> Schedule::parseEvents()
+void Schedule::parseEvents()
 {
-    std::vector<Event> events;
-
     for (std::vector<Day>::iterator dayIter = days.begin(); dayIter < days.end(); dayIter++)
     {
+        logger->info("Scanning Day " + std::to_string(dayIter->day));
         for (std::vector<Lesson>::iterator lessonIter = lessons.begin(); lessonIter < lessons.end(); lessonIter++)
         {
             for (int index = lessonIter->start; index <= lessonIter->end; index++)
@@ -64,13 +65,16 @@ std::vector<Event> Schedule::parseEvents()
                 std::string timeRaw = wks.cell(dayIter->timeCol + std::to_string(lessonIter->start)).value().get<std::string>();
                 if (validate(content))
                 {
-                    all_lessons.push_back(content);
-                    all_lessons.unique();
-                    if (taken(content))
+                    if (isAllLessons)
+                    {             
+                        all_lessons.push_back(content);
+                        all_lessons.unique();
+                    }  
+                    if (!haveClasses || taken(content))
                     {
                         Event event(content, location_length);
 
-                        Time_Interval ti(timeRaw, time_sep, hs_sep);
+                        Time_Interval ti(timeRaw, time_sep, hm_sep);
                         auto date = date::year_month_day{date::sys_days{monday} + date::days{dayIter->day} - date::days{1}};
                         event.dtstart = Calendar::todt(date, ti.start);
                         event.dtend = Calendar::todt(date, ti.end);
@@ -81,61 +85,97 @@ std::vector<Event> Schedule::parseEvents()
             }
         }
     }
-
-    return events;
 }
 
 
-void Schedule::readFromFile(std::string path, std::string wksName = "null")
+void Schedule::openDoc(std::string path)
 {
     doc.open(path);
+}
 
-    if (wksName == "null")
-    {
-        wksName = doc.workbook().worksheetNames()[0];
-    }
+void Schedule::openWks()
+{
     wks = doc.workbook().worksheet(wksName);
 }
 
 void Schedule::readConfig(json& config)
 {
-    if (config["exclude"] != "null")
+    logger->info("== Loading Configuration ==");
+
+    logger->info("Reading Exclude");
+    if (config.contains("exclude"))
     {
         isExclude = true;
 
         for (std::string dir: config["exclude"])
         {
+            logger->info("Exclude Found: \"" + dir + "\"");
             exclude.push_back(dir);
         }
         exclude = config["exclude"].get<std::vector<std::string>>();
     }
+    else
+    {
+        logger->info("Exclude Not Found");
+    }
+
+    logger->info("Reading Exclude_All");
     if (config["exclude_all"] != "null")
     {
         isExcludeAll = true;
-        exclude_all = config["exclude_all"].get<std::vector<std::string>>();
+        for (std::string dir: config["exclude_all"])
+        {
+            logger->info("Exclude_All Found: \"" + dir + "\"");
+            exclude_all.push_back(dir);
+        }
     }
-    classes = config["classes"].get<std::vector<std::string>>();
+    else
+    {
+        logger->info("Exclude_All Not Found");
+    }
 
+    logger->info("Reading Days");
     for (auto day: config["days"])
     {
         Day d(day["day"], day["col"], day["time"]);
         days.push_back(d);
     }
 
+    if (config.contains("courses"))
+    {
+        logger->info("Reading Courses");
+        
+        haveClasses = true;
+        coursesTaken = config["courses"].get<std::vector<std::string>>();
+    }
+
+    logger->info("Reading Lessons");
     for (auto lesson: config["lessons"])
     {
         Lesson l(lesson["start"], lesson["end"]);
         lessons.push_back(l);
     }
 
-    std::istringstream is{config["monday"].get<std::string>()};
-    date::sys_days sd;
-    is >> date::parse("%F", sd);
-    monday = sd;
+    if (config.contains("monday"))
+    {
+        logger->info("Reading Monday");
+        std::istringstream is{config["monday"].get<std::string>()};
+        date::sys_days sd;
+        is >> date::parse("%F", sd);
+        monday = sd;
+    }
+    else
+    {
+        logger->warning("Monday Not Found");
+    }
 
-    location_length = config["location_length"] == "null" ? location_length : config["location_length"].get<int>();
-    time_sep = config["time_sep"] == "null" ? time_sep : config["time_sep"].get<std::string>();
-    hs_sep = config["hs_sep"] == "null" ? hs_sep : config["hs_sep"].get<std::string>();
+    logger->info("Finding other variables");
+    location_length = !config.contains("location_length") ? location_length : config["location_length"].get<int>();
+    time_sep = !config.contains("time_sep") ? time_sep : config["time_sep"].get<std::string>();
+    hm_sep = !config.contains("hm_sep") ? hm_sep : config["hm_sep"].get<std::string>();
+    wksName = !config.contains("worksheet") ? doc.workbook().worksheetNames()[0] : config["worksheet"].get<std::string>();
+
+    logger->info("== Configuration Loaded ==");
 }
 
 void Schedule::exportAllLessons(std::string path)
@@ -146,4 +186,22 @@ void Schedule::exportAllLessons(std::string path)
         ofs << str << std::endl;
     }
     ofs.close();
+}
+
+void Schedule::readArgs(Args args)
+{
+    if (args.listPath != "")
+    {
+        isAllLessons = true;
+        allLessonsPath = args.listPath;
+    }
+
+    if (args.mondayOverride != "")
+    {
+        logger->info("Overriding " + args.mondayOverride);
+        std::istringstream is{args.mondayOverride};
+        date::sys_days sd;
+        is >> date::parse("%F", sd);
+        monday = sd;
+    }
 }

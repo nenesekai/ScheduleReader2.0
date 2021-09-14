@@ -61,10 +61,10 @@ Time::Time(std::string content, std::string hs_sep)
     from_string(content, hs_sep);
 }
 
-void Time::from_string(std::string content, std::string hs_sep)
+void Time::from_string(std::string content, std::string hm_sep)
 {
-    hour = stoi(content.substr(0, content.find(hs_sep)));
-    minute = stoi(content.substr(content.find(hs_sep) + hs_sep.length(), content.length() - content.find(hs_sep) - hs_sep.length()));
+    hour = stoi(content.substr(0, content.find(hm_sep)));
+    minute = stoi(content.substr(content.find(hm_sep) + hm_sep.length(), content.length() - content.find(hm_sep) - hm_sep.length()));
 }
 
 std::string Time::twodigit(int num)
@@ -84,8 +84,8 @@ std::string Time::to_string()
     return twodigit(hour) + twodigit(minute) + twodigit(second);
 }
 
-Time_Interval::Time_Interval(std::string content, std::string time_sep, std::string hs_sep)
+Time_Interval::Time_Interval(std::string content, std::string time_sep, std::string hm_sep)
 {
-    start.from_string(content.substr(0, content.find(time_sep)), hs_sep);
-    end.from_string(content.substr(content.find(time_sep) + 1, content.length() - content.find(time_sep) - 1), hs_sep);
+    start.from_string(content.substr(0, content.find(time_sep)), hm_sep);
+    end.from_string(content.substr(content.find(time_sep) + 1, content.length() - content.find(time_sep) - 1), hm_sep);
 }

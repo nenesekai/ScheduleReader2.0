@@ -1,13 +1,16 @@
 #pragma once
-#include "nlohmann/json.hpp"
+
 #include <string>
 #include <vector>
 #include <list>
 
+#include "nlohmann/json.hpp"
 #include "OpenXLSX.hpp"
-#include "calendar.h"
 #include "date/tz.h"
 #include "date/date.h"
+#include "calendar.h"
+#include "args.h"
+#include "logger.h"
 
 using nlohmann::json;
 
@@ -32,22 +35,33 @@ public:
     
     std::vector<std::string> exclude;
     std::vector<std::string> exclude_all;
-    std::vector<std::string> classes;
+    std::vector<std::string> coursesTaken;
     std::vector<Day> days;
     std::vector<Lesson> lessons;
-    date::year_month_day monday = date::April/30/2004;
+    std::vector<Event> events;
 
     std::list<std::string> all_lessons;
+    
     std::string time_sep = "-";
-    std::string hs_sep = ":";
+    std::string hm_sep = ":";
+    std::string wksName;
+    std::string allLessonsPath;
 
-    bool isExclude = false, isExcludeAll = false;
+    date::year_month_day monday = date::April/30/2004;
+
+    bool isExclude = false, isExcludeAll = false, isAllLessons = false, haveClasses = false;
     int location_length = 4;
 
-    std::vector<Event> parseEvents();
+    logger* logger;
 
-    void readFromFile(std::string path, std::string wksName);
+    Schedule(class logger* logger): logger(logger) {};
+
+    void parseEvents();
+
+    void openDoc(std::string path);
     void readConfig(json& config);
+    void openWks();
+    void readArgs(Args args);
     void exportAllLessons(std::string path);
     bool validate(std::string& content);
     bool taken(std::string& content);

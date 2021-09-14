@@ -1,5 +1,4 @@
 {
-    "name": "ssap config",
     "days": [
         { "day": 1, "col": "C", "time": "B" },
         { "day": 2, "col": "E", "time": "D" },
@@ -7,11 +6,6 @@
         { "day": 4, "col": "G", "time": "D" },
         { "day": 5, "col": "H", "time": "D" }
     ],
-    "monday": "2021-9-13",
-    "time_sep": "-",
-    "hm_sep": ":",
-    "location_length": 4,
-    "worksheet": "FAP",
     "lessons": [
         {"start": 4, "end": 16},
         {"start": 17, "end": 29},
@@ -22,20 +16,5 @@
         {"start": 82, "end": 93},
         {"start": 94, "end": 105},
         {"start": 106, "end": 106}
-    ],
-    "exclude": [
-        "自习室"
-    ],
-    "exclude_all": [
-        "",
-        "/"
-    ],
-    "courses": [
-        "Contemporary English-Class 2",
-        "AP Psychology-Class 1",
-        "AP Physics C E&M",
-        "ACT1",
-        "AP Environmental Science-Stephen Zhou",
-        "AP Statistics Class 2-Stephen Zhou"
     ]
 }

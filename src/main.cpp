@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <list>
+
 #include "nlohmann/json.hpp"
 #include "OpenXLSX.hpp"
 #include "args.h"
@@ -14,16 +15,21 @@ using namespace OpenXLSX;
 
 int main(int argc, char **argv)
 {
+    logger* logger = new class logger();
+
     // Process Arguments
-    Args args;
+    Args args(logger);
     args.read(argc, argv);
+    logger->report();
     try
     {
         args.validate();
     }
     catch (const std::invalid_argument &e)
     {
-        err(e.what());
+        logger->err(e.what());
+        std::cout << "Use schedule --help for usage and options" << std::endl;
+        exit(0);
     }
 
     // Read Config File
@@ -32,13 +38,23 @@ int main(int argc, char **argv)
     configFile >> config;
 
     // Handle with Schedule
-    Schedule schedule;
-    schedule.readFromFile(args.xlsxPath, config["worksheet"]);
+    Schedule schedule(logger);
+    schedule.openDoc(args.xlsxPath);
     schedule.readConfig(config);
+    schedule.openWks();
+    schedule.readArgs(args);
+    schedule.parseEvents();
 
-    Calendar calendar;
-    calendar.events = schedule.parseEvents();
-    schedule.exportAllLessons("./all.txt");
-    calendar.to_ical(args.outputPath);
+    if (args.outputPath != "")
+    {
+        Calendar calendar;
+        calendar.events = schedule.events;
+        calendar.to_ical(args.outputPath);
+    }
+
+    if (args.listPath != "")
+    {
+        schedule.exportAllLessons(args.listPath);
+    }
     return 0;
 }

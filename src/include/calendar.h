@@ -28,7 +28,7 @@ class Time_Interval
 public:
     Time start = Time(), end = Time();
 
-    Time_Interval(std::string content, std::string time_sep, std::string hs_sep);
+    Time_Interval(std::string content, std::string time_sep, std::string hm_sep);
 };
 
 class Event 
