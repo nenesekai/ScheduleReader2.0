@@ -1,0 +1,59 @@
+{
+    "name": "ssap config",
+    "days": [
+        {
+            "day": 1,
+            "col": "C",
+            "time": "B"
+        },
+        {
+            "day": 2,
+            "col": "E",
+            "time": "D"
+        },
+        {
+            "day": 3,
+            "col": "F",
+            "time": "D"
+        },
+        {
+            "day": 4,
+            "col": "G",
+            "time": "D"
+        },
+        {
+            "day": 5,
+            "col": "H",
+            "time": "D"
+        }
+    ],
+    "monday": "2021-9-13",
+    "time_sep": "-",
+    "hs_sep": ":",
+    "location_length": 4,
+    "worksheet": "FAP",
+    "lessons": [
+        {"start": 4, "end": 16},
+        {"start": 17, "end": 29},
+        {"start": 30, "end": 42},
+        {"start": 43, "end": 55},
+        {"start": 56, "end": 68},
+        {"start": 70, "end": 81},
+        {"start": 82, "end": 93},
+        {"start": 94, "end": 105},
+        {"start": 106, "end": 106}
+    ],
+    "exclude": [
+        "自习室"
+    ],
+    "exclude_all": [
+        "",
+        "/"
+    ],
+    "classes": [
+        "Contemporary English-Class 2",
+        "AP Psychology-Class 1",
+        "AP Physics C E&M",
+        "ACT1"
+    ]
+}
