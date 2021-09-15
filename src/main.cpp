@@ -1,32 +1,29 @@
 #include <iostream>
-#include <string>
 #include <list>
+#include <string>
 
-#include "nlohmann/json.hpp"
 #include "OpenXLSX.hpp"
 #include "args.h"
-#include "schedule.h"
-#include "logger.h"
 #include "calendar.h"
 #include "date/tz.h"
+#include "logger.h"
+#include "nlohmann/json.hpp"
+#include "schedule.h"
 
 using nlohmann::json;
 using namespace OpenXLSX;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-    logger* logger = new class logger();
+    Logger* logger = new Logger();
 
     // Process Arguments
     Args args(logger);
     args.read(argc, argv);
     logger->report();
-    try
-    {
+    try {
         args.validate();
-    }
-    catch (const std::invalid_argument &e)
-    {
+    } catch (const std::invalid_argument& e) {
         logger->err(e.what());
         std::cout << "Use schedule --help for usage and options" << std::endl;
         exit(0);
@@ -45,15 +42,13 @@ int main(int argc, char **argv)
     schedule.readArgs(args);
     schedule.parseEvents();
 
-    if (args.outputPath != "")
-    {
+    if (args.outputPath != "") {
         Calendar calendar;
         calendar.events = schedule.events;
         calendar.to_ical(args.outputPath);
     }
 
-    if (args.listPath != "")
-    {
+    if (args.listPath != "") {
         schedule.exportAllLessons(args.listPath);
     }
     return 0;
