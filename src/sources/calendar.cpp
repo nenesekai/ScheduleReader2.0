@@ -6,6 +6,8 @@
 #include <vector>
 #include <chrono>
 
+#include "date/tz.h"
+
 Event::Event(std::string content, int location_length)
 {
     summary = location_length == 0 ? content : content.substr(0, content.find_last_of('-'));
@@ -17,8 +19,8 @@ void Event::write(std::ofstream& ofs)
     ofs << "BEGIN:VEVENT" << std::endl;
 
     if (summary != "") ofs << "SUMMARY:" << summary << std::endl;
-    if (dtstart != "") ofs << "DTSTART:" << dtstart << std::endl;
-    if (dtend != "") ofs << "DTEND:" << dtend << std::endl;
+    ofs << "DTSTART:" << date::format(this->format, date::make_zoned(outputTimeZone, timeStart)) << std::endl;
+    ofs << "DTEND:" << date::format(this->format, date::make_zoned(outputTimeZone, timeEnd)) << std::endl;
     if (location != "") ofs << "LOCATION:" << location << std::endl;
     if (description != "") ofs << "DESCRIPTION:" << description << std::endl;
 
@@ -27,9 +29,13 @@ void Event::write(std::ofstream& ofs)
     ofs << "END:VEVENT" << std::endl;
 }
 
-std::string Calendar::todt(date::year_month_day date, Time time)
+void Event::parse_time(date::local_days date, std::string timeRaw, std::string time_sep, std::string hm_sep)
 {
-    return date::format("%Y%m%d", date) + "T" + time.to_string() + "Z";
+    std::string timeRawStart = timeRaw.substr(0, timeRaw.find(time_sep));
+    std::string timeRawEnd = timeRaw.substr(timeRaw.find(time_sep) + 1, timeRaw.length() - timeRaw.find(time_sep) - 1);
+
+    timeStart = date::make_zoned(timezone, date + std::chrono::hours(std::stoi(timeRawStart.substr(0, timeRawStart.find(hm_sep)))) + std::chrono::minutes(std::stoi(timeRawStart.substr(timeRawStart.find(hm_sep) + 1, timeRawStart.length() - timeRawStart.find(hm_sep) - 1))));
+    timeEnd = date::make_zoned(timezone, date + std::chrono::hours(std::stoi(timeRawEnd.substr(0, timeRawEnd.find(hm_sep)))) + std::chrono::minutes(std::stoi(timeRawEnd.substr(timeRawEnd.find(hm_sep) + 1, timeRawEnd.length() - timeRawEnd.find(hm_sep) - 1))));
 }
 
 void Calendar::to_ical(std::string path)
@@ -51,41 +57,4 @@ void Calendar::to_ical(std::string path)
     }
 
     ical << "END:VCALENDAR\n";
-}
-
-Time::Time(std::string content, std::string hs_sep)
-{
-    hour = 0;
-    minute = 0;
-    second = 0;
-    from_string(content, hs_sep);
-}
-
-void Time::from_string(std::string content, std::string hm_sep)
-{
-    hour = stoi(content.substr(0, content.find(hm_sep)));
-    minute = stoi(content.substr(content.find(hm_sep) + hm_sep.length(), content.length() - content.find(hm_sep) - hm_sep.length()));
-}
-
-std::string Time::twodigit(int num)
-{
-    if (num < 10)
-    {
-        return "0" + std::to_string(num);
-    }
-    else
-    {
-        return std::to_string(num);
-    }
-}
-
-std::string Time::to_string()
-{
-    return twodigit(hour) + twodigit(minute) + twodigit(second);
-}
-
-Time_Interval::Time_Interval(std::string content, std::string time_sep, std::string hm_sep)
-{
-    start.from_string(content.substr(0, content.find(time_sep)), hm_sep);
-    end.from_string(content.substr(content.find(time_sep) + 1, content.length() - content.find(time_sep) - 1), hm_sep);
 }

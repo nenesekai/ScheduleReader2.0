@@ -10,9 +10,6 @@
 #include "nlohmann/json.hpp"
 #include "schedule.h"
 
-using nlohmann::json;
-using namespace OpenXLSX;
-
 int main(int argc, char** argv)
 {
     Logger* logger = new Logger();
@@ -31,7 +28,7 @@ int main(int argc, char** argv)
 
     // Read Config File
     std::ifstream configFile(args.configPath);
-    json config;
+    nlohmann::json config;
     configFile >> config;
 
     // Handle with Schedule
@@ -51,5 +48,6 @@ int main(int argc, char** argv)
     if (args.listPath != "") {
         schedule.exportAllLessons(args.listPath);
     }
+    
     return 0;
 }

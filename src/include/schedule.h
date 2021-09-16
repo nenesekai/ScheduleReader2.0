@@ -46,10 +46,11 @@ public:
 
     std::string time_sep = "-";
     std::string hm_sep = ":";
+    std::string timezone = "Asia/Shanghai";
     std::string wksName;
     std::string allLessonsPath;
-
-    date::year_month_day monday = date::April / 30 / 2004;
+  
+    date::local_days monday = date::local_days{date::April/30/2004};
 
     bool isExclude = false, isExcludeAll = false, isAllLessons = false, haveClasses = false;
     int location_length = 4;

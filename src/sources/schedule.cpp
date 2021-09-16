@@ -63,6 +63,9 @@ void Schedule::parseEvents()
             {
                 std::string content = wks.cell(dayIter->col + std::to_string(index)).value().get<std::string>();
                 std::string timeRaw = wks.cell(dayIter->timeCol + std::to_string(lessonIter->start)).value().get<std::string>();
+
+                logger->info("Content Detected: " + content + " with time raw: " + timeRaw);
+
                 if (validate(content))
                 {
                     if (isAllLessons)
@@ -72,15 +75,15 @@ void Schedule::parseEvents()
                     }  
                     if (!haveClasses || taken(content))
                     {
+                        logger->info("Matched Rule, Adding to Calendar");
                         Event event(content, location_length);
-
-                        Time_Interval ti(timeRaw, time_sep, hm_sep);
-                        auto date = date::year_month_day{date::sys_days{monday} + date::days{dayIter->day} - date::days{1}};
-                        event.dtstart = Calendar::todt(date, ti.start);
-                        event.dtend = Calendar::todt(date, ti.end);
-
+                        event.parse_time(monday + date::days(dayIter->day - 1), timeRaw);
                         events.push_back(event);
                     }
+                }
+                else
+                {
+                    logger->info("Invalid Content, Skipping");
                 }
             }
         }
@@ -160,9 +163,7 @@ void Schedule::readConfig(json& config)
     {
         logger->info("Reading Monday");
         std::istringstream is{config["monday"].get<std::string>()};
-        date::sys_days sd;
-        is >> date::parse("%F", sd);
-        monday = sd;
+        is >> date::parse("%F", monday);
     }
     else
     {
@@ -198,10 +199,8 @@ void Schedule::readArgs(Args args)
 
     if (args.mondayOverride != "")
     {
-        logger->info("Overriding " + args.mondayOverride);
+        logger->info("Overriding Monday");
         std::istringstream is{args.mondayOverride};
-        date::sys_days sd;
-        is >> date::parse("%F", sd);
-        monday = sd;
+        is >> date::parse("%F", monday);
     }
 }
