@@ -3,13 +3,13 @@
 #include <iostream>
 #include <string>
 
-class logger
+class Logger
 {
 public:
     int level;
 
-    logger(): level(0) {};
-    logger(int level): level(level) {};
+    Logger(): level(0) {};
+    Logger(int level): level(level) {};
 
     void err(std::string msg);
     void warning(std::string msg);

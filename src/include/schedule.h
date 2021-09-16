@@ -1,38 +1,40 @@
 #pragma once
 
+#include <list>
 #include <string>
 #include <vector>
-#include <list>
 
-#include "nlohmann/json.hpp"
 #include "OpenXLSX.hpp"
-#include "date/tz.h"
-#include "date/date.h"
-#include "calendar.h"
 #include "args.h"
+#include "calendar.h"
+#include "date/date.h"
+#include "date/tz.h"
 #include "logger.h"
+#include "nlohmann/json.hpp"
 
 using nlohmann::json;
 
-class Schedule
-{
+class Schedule {
 public:
-    struct Day
-    {
+    struct Day {
         int day;
         std::string col, timeCol;
-        Day(int d, std::string c, std::string tc): day(d), col(c), timeCol(tc) {};
+        Day(int d, std::string c, std::string tc)
+            : day(d)
+            , col(c)
+            , timeCol(tc) {};
     };
 
-    struct Lesson
-    {
+    struct Lesson {
         int start, end;
-        Lesson(int s, int e): start(s), end(e) {};
+        Lesson(int s, int e)
+            : start(s)
+            , end(e) {};
     };
 
     OpenXLSX::XLDocument doc;
     OpenXLSX::XLWorksheet wks;
-    
+
     std::vector<std::string> exclude;
     std::vector<std::string> exclude_all;
     std::vector<std::string> coursesTaken;
@@ -41,23 +43,22 @@ public:
     std::vector<Event> events;
 
     std::list<std::string> all_lessons;
-    
+
     std::string time_sep = "-";
     std::string hm_sep = ":";
     std::string timezone = "Asia/Shanghai";
     std::string wksName;
     std::string allLessonsPath;
-
-    // date::zoned_time<std::chrono::seconds> monday = date::make_zoned("Asia/Shanghai", date::local_days{date::April/30/1978});
-
+  
     date::local_days monday = date::local_days{date::April/30/2004};
 
     bool isExclude = false, isExcludeAll = false, isAllLessons = false, haveClasses = false;
     int location_length = 4;
 
-    logger* logger;
+    Logger* logger;
 
-    Schedule(class logger* logger): logger(logger) {};
+    Schedule(Logger* logger)
+        : logger(logger) {};
 
     void parseEvents();
 
