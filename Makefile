@@ -1,4 +1,7 @@
 all:
+	$(MAKE) clean
+	$(MAKE) build
+	$(MAKE) main
 
 build: CMakeLists.txt
 	cmake -S . -B ./build

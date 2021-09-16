@@ -1,49 +1,52 @@
 # Schedule Reader 2.0
 
-Automatically convert your excel schedule from your teacher to an iCalendar file that you can import into services like Google Calendar with just some configuration.
+中文｜[Eng](readme_en.md)
 
-## How to Get It?
+还在每节课上课前打开Office查看课程表吗？还在一个个把你自己的课程打进去日历软件吗？本软件可以自动把你Excel的课程表转换到可以被各大日历服务所识别的iCalendar文件。只需要一次配置，就可以在每周发课程表的时候自动转换生成然后导入到你所喜爱的日历软件里面去。
 
-### Download the binary version
+这是我写的第一个真正没有烂尾的项目，求求你了给个小小的星星吧
 
-Go to the [Release](https://github.com/Asiimoviet/ScheduleReader2.0/releases) and download the latest Version.
+## 适配的日历软件
 
-### Build it yourself
+导出的格式为iCalendar文件。该文件可以被大部分的日历服务所识别且导入。这些是被测试过的平台。
 
-Download the repository and build it with ```make```
-```
+| 服务 | 可用程度 |
+| --- | --- |
+| 谷歌日历 | ✅ |
+| 苹果日历 | ✅ |
+
+其他的平台理论可用，只是没有经过测试。欢迎在Issue中提出任何你遇到的无法正常识别的平台。
+
+## 如何下载？
+
+### 下载编译好的版本
+
+在[Release](https://github.com/Asiimoviet/ScheduleReader2.0/releases)中下载最新的版本
+
+### 自己编译
+
+把这个仓库clone下来，然后使用```make```编译
+``` bash
 git clone https://github.com/Asiimoviet/ScheduleReader2.0
 cd ScheduleReader2.0
 make
 ```
 
-## How to use it?
+## 如何使用？
 
-### Usage and Options
+在针对你的课程表配置后，命令行跑编译后的```schedule```，运行```schedule --help```以获得相关的帮助
 
-Run ```schedule --help``` to get usage and options
+通用格式：
+```./schedule --file 课程表文件 --config 配置文件 --output [输出到的地方]```
 
-### Configurations
+## 如何配置？
 
-When running the program, you will be asked to provide a config file that tells the program the location of elements in your excel file.
+现在的配置文件不完善，先不写了。可以参考在examples里面的[配置文件](examples/config.json)
 
-Here are the keys of config:
-- exclude
-- exclude_all
-- days
-- courses
-- monday
-- location_length
-- time_sep
-- hm_sep
+## 相对1.0有什么不同？
+1.0是使用Python写的，2.0是用C++写的。理论上兼容性更好，效率更高。
 
-You can find the [minimal config](examples/config_minimal.json) and [example config](examples/config.json) in the examples folder.
-
-## What is different in 2.0?
-This is it is writtened completely on C++ instead of Python.
-
-## Acknowledge
-Thanks these awesome authors for making wonderful libraries for this project.
+## 用到的库
 - [nlohmann/json](https://github.com/nlohmann/json)
 - [troldal/OpenXLSX](https://github.com/troldal/OpenXLSX)
 - [HowardHinnant/date](https://github.com/HowardHinnant/date)
