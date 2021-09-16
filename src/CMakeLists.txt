@@ -11,6 +11,9 @@ target_link_libraries(schedule
     PRIVATE nlohmann_json::nlohmann_json OpenXLSX-static date-tz calendar logger)
 
 add_executable(main main.cpp)
+add_executable(test test.cpp)
 target_link_libraries(main 
+    PRIVATE nlohmann_json::nlohmann_json OpenXLSX-static args calendar schedule logger date-tz)
+target_link_libraries(test
     PRIVATE nlohmann_json::nlohmann_json OpenXLSX-static args calendar schedule logger date-tz)
 set_target_properties(main PROPERTIES OUTPUT_NAME "schedule")

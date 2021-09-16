@@ -6,8 +6,11 @@
 
 void Args::read(int argc, char** argv) 
 {
+    logger->info("-- Reading Arguments --");
     for (int index = 1; index < argc; index++)
     {
+        logger->info("Argument Found: " + std::string(argv[index]));
+
         if (strcmp(argv[index], "-c") == 0 || strcmp(argv[index], "--config") == 0)
         {
             configPath = std::string(argv[index + 1]);
