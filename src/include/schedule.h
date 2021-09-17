@@ -38,6 +38,7 @@ public:
     std::vector<std::string> exclude;
     std::vector<std::string> exclude_all;
     std::vector<std::string> coursesTaken;
+    std::vector<std::string> deletes;
     std::vector<Day> days;
     std::vector<Lesson> lessons;
     std::vector<Event> events;
@@ -52,7 +53,7 @@ public:
   
     date::local_days monday = date::local_days{date::April/30/2004};
 
-    bool isExclude = false, isExcludeAll = false, isAllLessons = false, haveClasses = false;
+    bool haveDelete = false, isExclude = false, isExcludeAll = false, isAllLessons = false, haveClasses = false;
     int location_length = 4;
 
     Logger* logger;

@@ -76,6 +76,16 @@ void Schedule::parseEvents()
                     if (!haveClasses || taken(content))
                     {
                         logger->info("Matched Rule, Adding to Calendar");
+                        if (haveDelete)
+                        {
+                            for (std::vector<std::string>::iterator deleteIter = deletes.begin(); deleteIter < deletes.end(); deleteIter++)
+                            {
+                                if (content.find(*deleteIter) != std::string::npos)
+                                {
+                                    content.erase(content.find(*deleteIter), (*deleteIter).length());
+                                }
+                            }
+                        }
                         Event event(content, location_length);
                         event.parse_time(monday + date::days(dayIter->day - 1), timeRaw);
                         events.push_back(event);
@@ -142,6 +152,14 @@ void Schedule::readConfig(json& config)
     {
         Day d(day["day"], day["col"], day["time"]);
         days.push_back(d);
+    }
+
+    if (config.contains("deletes"))
+    {
+        logger->info("Reading deletes");
+
+        deletes = config["deletes"].get<std::vector<std::string>>();
+        haveDelete = true;
     }
 
     if (config.contains("courses"))

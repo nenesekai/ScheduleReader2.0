@@ -30,6 +30,9 @@
         "",
         "/"
     ],
+    "deletes": [
+        "ACT1-"
+    ],
     "courses": [
         "Contemporary English-Class 2",
         "AP Psychology-Class 1",
